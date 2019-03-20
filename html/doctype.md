@@ -1,5 +1,11 @@
 ![DOCTYPE](../imgs/doctype.png)
+## 关键知识点
+```html
+<!DOCTYPE html>
+```
+在html文件的第一行按上述方式书写doctype即可保证主流浏览器都采用标准模式渲染。
 
+## DOCTYPE介绍
 DOCTYPE的全称为Document Type Declaration
 
 所有的html都需要一个DOCTYPE声明，并写在文档的开始。

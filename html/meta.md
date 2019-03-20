@@ -1,4 +1,14 @@
 ![Meta标签](../imgs/meta.jpg)
+## 关键知识点
+```html
+    <meta charset="UTF-8">
+```
+用来描述网页的字符编码，建议放在head标签的第一行。因为如果在它之前出现了其他中文，如title标签中有中文，可能会导致中文乱码。
+```html
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+```
+防止高版本的IE浏览器使用IE7模式，这个必须放在任何script标签前面，否则会不起作用。
+
 ## 描述
 meta的全称是metadata。中文翻译为元数据。
 
@@ -15,12 +25,13 @@ meta的全称是metadata。中文翻译为元数据。
 
 翻译成中文就是说用来定义页面的说明、关键字、作者、最后修改时间等元信息来让机器识别，包括浏览器和爬虫等。
 
-## 常用的meta
-
-## 常用的meta
+## 需要特殊关注的meta
 ```html
     <meta charset="UTF-8"><!--用来描述网页的字符编码，建议放在head标签的第一行。因为如果在它之前出现了其他中文，如title标签中有中文，可能会导致中文乱码。-->
     <meta http-equiv="X-UA-Compatible" content="ie=edge"><!--防止高版本的IE浏览器使用IE7模式，这个必须放在任何script标签前面，否则会不起作用。-->
+```
+## 常用的meta
+```html
     <meta name="keywords" content="关键字1,关键字2"><!-- 用于SEO，告诉搜索引擎，网页的关键字信息。 -->
     <meta name="description" content="网页内容的摘要描述"><!-- 用于SEO，告诉搜索引擎，网页的摘要信息。 -->
     <meta name="robots" content="none"><!--
