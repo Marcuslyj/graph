@@ -1,4 +1,4 @@
-![DOCTYPE](../imgs/doctype.png)
+![DOCTYPE](../img/doctype.png)
 ## 关键知识点
 ```html
 <!DOCTYPE html>

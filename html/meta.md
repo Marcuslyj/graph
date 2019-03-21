@@ -1,4 +1,4 @@
-![Meta标签](../imgs/meta.jpg)
+![Meta标签](../img/meta.jpg)
 ## 关键知识点
 ```html
     <meta charset="UTF-8">

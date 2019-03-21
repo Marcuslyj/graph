@@ -1,4 +1,4 @@
-![head标签](../imgs/head.png)
+![head标签](../img/head.png)
 ## 关键知识点
 如果head中包含js或css外链，在外链加载完成之前，当前页面是空白的状态，因此head中外链js或css必须慎重考虑。这个白屏的时间，对用户体验至关重要。
 
