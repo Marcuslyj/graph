@@ -1,0 +1,23 @@
+{
+  "name": "graph",
+  "version": "1.0.0",
+  "description": "力争做一份无死角的前端知识体系图谱 ## html相关 ### [DOCTYPE是什么](html/doctype.md) ### [head](html/head.md) ### [Meta的注意项](html/meta.md) ### [src和href的区别](html/src_href.md)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tinder1024/graph.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tinder1024/graph/issues"
+  },
+  "homepage": "https://github.com/tinder1024/graph#readme",
+  "dependencies": {
+    "ts-node": "^8.0.3",
+    "typescript": "^3.3.4000"
+  }
+}
