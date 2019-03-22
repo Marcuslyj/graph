@@ -24,5 +24,21 @@
     </select>
     <input type="text">
     <input type="button" value="inputBtn">
+
+    <a href="#" onclick="return false">return false</a>
+    <br/>
+    <a href="https://www.baidu.com" onclick="return false">baidu</a>
+    <a href="https://www.baidu.com" onclick="doSome();return false">baiduDoSome</a>
+    <a href="#" onclick="doSome(true);return false">baiduDoSomeError</a>
+    <br>
+    <a href="javascript:;">javascript</a>
+    <script>
+        window.doSome = function(error){
+            var a = null;
+            if(error){
+                a.bc();
+            }
+        }
+    </script>
 </body>
 </html>
