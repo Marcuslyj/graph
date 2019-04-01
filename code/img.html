@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Img test</title>
+    <style>
+        img{
+        }
+        .img2{
+            width:150px;
+        }
+        .pseudo li::before{
+            content:'b';
+        }
+    </style>
+</head>
+<body>
+    <img src="https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=2779070586,3489688379&fm=58" alt="" width="100">
+    <img class="img2" src="https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=2557414929,1586734827&fm=58" alt="">
+    <img src="" alt="空src">
+    <img alt="无src">
+    <button>btn</button>
+    <select name="" id="">
+        <option value="a">a</option>
+    </select>
+    <input type="text">
+    <input type="button" value="inputBtn">
+
+    <a href="#" onclick="return false">return false</a>
+    <br/>
+    <a href="https://www.baidu.com" onclick="return false">baidu</a>
+    <a href="https://www.baidu.com" onclick="doSome();return false">baiduDoSome</a>
+    <a href="#" onclick="doSome(true);return false">baiduDoSomeError</a>
+    <br>
+    <a href="javascript:;">javascript</a>
+    <ul class="pseudo">
+        <li>A</li>
+        <li>B</li>
+    </ul>
+    <script>
+        window.doSome = function(error){
+            var a = null;
+            if(error){
+                a.bc();
+            }
+        }
+    </script>
+</body>
+</html>
