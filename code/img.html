@@ -11,6 +11,9 @@
         .img2{
             width:150px;
         }
+        .pseudo li::before{
+            content:'b';
+        }
     </style>
 </head>
 <body>
@@ -32,6 +35,10 @@
     <a href="#" onclick="doSome(true);return false">baiduDoSomeError</a>
     <br>
     <a href="javascript:;">javascript</a>
+    <ul class="pseudo">
+        <li>A</li>
+        <li>B</li>
+    </ul>
     <script>
         window.doSome = function(error){
             var a = null;
