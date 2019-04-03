@@ -1,4 +1,4 @@
-import {Tree,Comparable,Weight} from './define';
+import {Tree,Comparable,Weight} from './collection';
 import utils from '../utils';
 export class BNode<T extends Comparable<T>>{
     private _leftNode:BNode<T> = null;
@@ -76,7 +76,7 @@ export class BNode<T extends Comparable<T>>{
 }
 
 
-class BinarySearchTree<T extends Comparable<T>> implements Tree<T>{
+export class BinarySearchTree<T extends Comparable<T>> implements Tree<T>{
     rootNode:BNode<T>;
     private _size:number = 0;
     range(begin: T, end: T): T[] {
@@ -227,24 +227,3 @@ class BinarySearchTree<T extends Comparable<T>> implements Tree<T>{
         return null;
     }
 }
-
-let init = function(){
-    let data:number[] =
-            //[8,1,4,7,3,5,11,8,3,4,5,2,6,8,9],
-            utils.randNumArr(50),
-        tests:number[] = [3,9],
-        tree:Tree<Weight> = new BinarySearchTree<Weight>();
-    data.forEach((d:number)=>{tree.add(Weight.from(d))});
-    console.log(data.join(','))
-    tree.print();
-    tree.remove(Weight.from(4));
-    tree.print();
-    tests.forEach(function(d:number){
-        console.log(d,tree.contains(Weight.from(d)));
-    });
-    console.log('max',tree.findMax().toString());
-    console.log('min',tree.findMin().toString());
-
-}
-
-init();

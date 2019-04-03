@@ -1,16 +1,50 @@
-import {Heap,Comparable,Weight} from './define';
+import {Queue,Comparable} from './collection';
 
-class ArrayHeap<T extends Comparable<T>> implements Heap<T>{
+export class ArrayHeap<T extends Comparable<T>> implements Queue<T>{
     private _arr:T[];
     private _offset:number = -1;
-    constructor(capacity:number){
+    constructor(capacity:number = 16){
         this._arr = new Array<T>(capacity);
     }
     findMin(): T {
         return this._arr[0]||null;
     }    
     removeMin(): T {
-        throw new Error("Method not implemented.");
+        if(this._offset < 0)return null;
+        let min:T = this.findMin();
+        let holeIdx = 0;
+        while(true){
+            let leftSubIdx = this.getLeftIdx(holeIdx),
+                leftSubItem = this.getLeftItem(holeIdx),
+                rightSubIdx = this.getRightIdx(holeIdx),
+                rightSubItem = this.getRightItem(holeIdx),
+                moveIdx:number = 0,
+                needBreak = false;
+            if(rightSubItem){
+                if(leftSubItem.compareTo(rightSubItem) < 0){
+                    moveIdx = leftSubIdx;
+                }
+                else{
+                    moveIdx = rightSubIdx;
+                }
+            }
+            else if(leftSubItem){
+                moveIdx = leftSubIdx;
+            }
+            else if(holeIdx != this._offset){
+                moveIdx = this._offset;
+                needBreak = true
+            }
+            else{
+                break;
+            }
+            this._arr[holeIdx] = this._arr[moveIdx];
+            holeIdx = moveIdx;
+            if(needBreak)break;
+        }
+        delete this._arr[this._offset];
+        this._offset --;
+        return min;
     }
     add(value: T): boolean {
         this._offset++;
@@ -48,7 +82,12 @@ class ArrayHeap<T extends Comparable<T>> implements Heap<T>{
     }
 
     print(){
-        console.log(this._arr.map((i:T)=>i.toString()).join(','));
+        let arr = [];
+        for(let i=0;i<=this._offset;i++){
+            let t:T = this._arr[i];
+            arr.push(t.toString());
+        }
+        console.log('Array Heap : ',arr.join(','));
     }
 
     private getItem(idx:number):T{
@@ -79,13 +118,3 @@ class ArrayHeap<T extends Comparable<T>> implements Heap<T>{
     }
 }
 
-let init = function(){
-    let data:number[] = [8,3,6,4,2,7];
-    let heap:Heap<Weight> = new ArrayHeap<Weight>(16);
-    data.forEach(function(n:number){
-        heap.add(Weight.from(n));
-    });
-    heap.print();
-    console.log('min',heap.findMin().toString());
-}
-init();
