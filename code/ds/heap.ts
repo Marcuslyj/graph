@@ -15,9 +15,9 @@ export class ArrayHeap<T extends Comparable<T>> implements Queue<T>{
         let holeIdx = 0;
         while(true){
             let leftSubIdx = this.getLeftIdx(holeIdx),
-                leftSubItem = this.getLeftItem(holeIdx),
+                leftSubItem = this.getItem(leftSubIdx),
                 rightSubIdx = this.getRightIdx(holeIdx),
-                rightSubItem = this.getRightItem(holeIdx),
+                rightSubItem = this.getItem(rightSubIdx),
                 moveIdx:number = 0,
                 needBreak = false;
             if(rightSubItem){

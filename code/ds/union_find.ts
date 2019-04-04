@@ -92,8 +92,8 @@ class Room implements Indexable{
     }    
     toString(): string {
         let b:string = (this._y == this._maze.height - 1 || this._wall[Room.WALL_BOTTOM])?'_':' ',
-            r:string = (this._x == this._maze.width - 1 || this._wall[Room.WALL_RIGHT])?'|':' ',
-            l:string = this._x == 0?'|':'';
+            r:string = (this._x == this._maze.width - 1 && this._y == this._maze.height - 1)?'>':(this._x == this._maze.width - 1 || this._wall[Room.WALL_RIGHT])?'|':' ',
+            l:string = (this._x == 0 && this._y == 0)?'>':this._x == 0 ?'|':'';
         return l+b+r;
     }
 
@@ -131,7 +131,8 @@ export class Maze{
 
     init(){
         while(!this._uf.test(this._startRoom,this._endRoom)){
-            this.randBreakWall();
+            if(this.randBreakWall()){
+            }
         }
         this.each((x:number,y:number,idx:number)=>{
             let room = this._roomList[idx];

@@ -50,8 +50,8 @@ let testUnionFind = function(){
 }
 
 let testMaze = function(){
-    const SIZE = 10;
-    let maze:Maze = new Maze(SIZE);
+    const SIZE = 15;
+    let maze:Maze = new Maze(SIZE*2,SIZE);
     maze.init();
     maze.print();
 }
