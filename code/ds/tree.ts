@@ -1,10 +1,11 @@
-import {Tree,Comparable,Weight} from './collection';
+import {Tree,Value} from './collection';
 import utils from '../utils';
-export class BNode<T extends Comparable<T>>{
+export class BNode<T extends Value<T>>{
     private _leftNode:BNode<T> = null;
     private _rightNode:BNode<T> = null;
     private _parentNode:BNode<T> = null;
     private _value:T;
+    public isBlack:boolean = true;
     constructor(value:T){
         this._value = value;
     }
@@ -76,7 +77,7 @@ export class BNode<T extends Comparable<T>>{
 }
 
 
-export class BinarySearchTree<T extends Comparable<T>> implements Tree<T>{
+export class BinarySearchTree<T extends Value<T>> implements Tree<T>{
     rootNode:BNode<T>;
     private _size:number = 0;
     range(begin: T, end: T): T[] {
@@ -226,4 +227,8 @@ export class BinarySearchTree<T extends Comparable<T>> implements Tree<T>{
         }
         return null;
     }
+}
+
+export class RBTree<T extends Value<T>> extends BinarySearchTree<T>{
+
 }
