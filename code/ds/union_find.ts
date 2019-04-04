@@ -68,10 +68,10 @@ export class ArrayUnionFind<T extends Indexable> implements UnionFind<T>{
         console.log('AUF : ',arr.join(','));
     }
 }
-
+type Wall = 1|0;
 class Room implements Indexable{
-    static WALL_RIGHT = 0;
-    static WALL_BOTTOM = 1;
+    static WALL_RIGHT:Wall = 0;
+    static WALL_BOTTOM:Wall = 1;
     private _wall:boolean[] = [true,true];
     private _idx:number;
     constructor(private _x:number,private _y:number,private _maze:Maze){
@@ -83,7 +83,7 @@ class Room implements Indexable{
             this._wall[Room.WALL_BOTTOM] = false;
         }
     }
-    breakWall(wall:number){
+    breakWall(wall:Wall){
         this._wall[wall] = false;
     }
 
@@ -143,7 +143,7 @@ export class Maze{
     private randBreakWall():boolean{
         let rnd = Math.floor(Math.random() * this._roomList.length);
         let room = this._roomList[rnd],
-            wall = -1;
+            wall:Wall = 0;
         if(room.wallBottom && room.wallRight){
             wall = Math.random() < 0.5 ? Room.WALL_RIGHT:Room.WALL_BOTTOM;
         }
@@ -159,7 +159,7 @@ export class Maze{
         return this.breakWall(room,wall);
     }
 
-    breakWall(room:Room,wall:number):boolean{
+    breakWall(room:Room,wall:Wall):boolean{
         let nRoom = this.getNeighborhood(room,wall);
         if(!nRoom)return false;
         if(this._uf.test(room,nRoom)){
@@ -170,7 +170,7 @@ export class Maze{
         return true;
     }
 
-    getNeighborhood(room:Room,wall:number):Room{
+    getNeighborhood(room:Room,wall:Wall):Room{
         let nIdx:number = 0;
         if(wall == Room.WALL_BOTTOM){
             if(room.y == this._height - 1)return null;

@@ -33,7 +33,6 @@ export interface Comparable<T>{
     valueOf():number;
     toString():string;
 }
-export type Value<T> = number|Comparable<T>;
 export interface Indexable{
     getIndex():number;
     toString():string;
@@ -54,13 +53,13 @@ export interface Collection<T>{
     size():number;
     print():void;
 }
-export interface Tree<T extends Value<T>> extends Collection<T>{
+export interface Tree<T extends Comparable<T>> extends Collection<T>{
     findMax():T;
     findMin():T;
     range(begin:T,end:T):T[];
 }
 
-export interface Queue<T extends Value<T>> extends Collection<T>{
+export interface Queue<T extends Comparable<T>> extends Collection<T>{
     /**
      * 获取但不移除此队列的头；如果此队列为空，则返回 null。
      */

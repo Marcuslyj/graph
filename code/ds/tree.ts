@@ -1,11 +1,15 @@
-import {Tree,Value} from './collection';
+import {Tree,Comparable} from './collection';
 import utils from '../utils';
-export class BNode<T extends Value<T>>{
+type NodeColor = ''|'R'|'B';
+export class BNode<T extends Comparable<T>>{
+    static NO_COLOR:NodeColor = '';
+    static BLACK:NodeColor = 'B';
+    static RED:NodeColor = 'R';
     private _leftNode:BNode<T> = null;
     private _rightNode:BNode<T> = null;
     private _parentNode:BNode<T> = null;
     private _value:T;
-    public isBlack:boolean = true;
+    public color:NodeColor = BNode.NO_COLOR;
     constructor(value:T){
         this._value = value;
     }
@@ -77,9 +81,9 @@ export class BNode<T extends Value<T>>{
 }
 
 
-export class BinarySearchTree<T extends Value<T>> implements Tree<T>{
-    rootNode:BNode<T>;
-    private _size:number = 0;
+export class BinarySearchTree<T extends Comparable<T>> implements Tree<T>{
+    protected _rootNode:BNode<T>;
+    protected _size:number = 0;
     range(begin: T, end: T): T[] {
         throw new Error("Method not implemented.");
     }
@@ -87,30 +91,36 @@ export class BinarySearchTree<T extends Value<T>> implements Tree<T>{
         return this._size == 0;
     }
     add(value:T):boolean{
-        if(!this.rootNode){
-            this.rootNode = new BNode(value);
+        let n = this.doAdd(value);
+        return n != null;
+    }
+    protected doAdd(value:T):BNode<T>{
+        if(!this._rootNode){
+            this._rootNode = new BNode(value);
             this._size ++;
-            return false;
+            return this._rootNode;
         }
-        let curNode = this.rootNode;
+        let curNode = this._rootNode;
         while(true){
             let c = value.compareTo(curNode.value);
             if(c == 0){
-                return false;
+                return null;
             }
             if(c < 0){
                 if(!curNode.leftNode){
-                    curNode.setLeftNode(new BNode(value));
+                    let n = new BNode(value);
+                    curNode.setLeftNode(n);
                     this._size++;
-                    return true;
+                    return n;
                 }
                 curNode = curNode.leftNode;
             }
             else{
                 if(!curNode.rightNode){
-                    curNode.setRightNode(new BNode(value));
+                    let n = new BNode(value);
+                    curNode.setRightNode(n);
                     this._size++;
-                    return true;
+                    return n;
                 }
                 curNode = curNode.rightNode;
             }
@@ -118,7 +128,7 @@ export class BinarySearchTree<T extends Value<T>> implements Tree<T>{
     }
 
     findNode(targetValue:T):BNode<T>{
-        let curNode = this.rootNode;
+        let curNode = this._rootNode;
         while(true){
             if(!curNode)return null;
             let c = targetValue.compareTo(curNode.value);
@@ -165,8 +175,8 @@ export class BinarySearchTree<T extends Value<T>> implements Tree<T>{
     private doDelete(n:BNode<T>):void{
         let p = n.parentNode;
         let oneChild:BNode<T>;
-        if(n == this.rootNode){
-            this.rootNode = null;
+        if(n == this._rootNode){
+            this._rootNode = null;
             n.destroy();
         }
         else if(n.isLeaf()){
@@ -196,21 +206,21 @@ export class BinarySearchTree<T extends Value<T>> implements Tree<T>{
 
     print():void{
         let arr:string[] = ['BST size = ',String(this._size),'\n'];
-        this.doPrint(this.rootNode,0,arr);
+        this.doPrint(this._rootNode,0,arr);
         console.log(arr.join(''),'\n');
     }
     private doPrint(curNode:BNode<T>,deep:number,arr:string[]){
-        arr.push(utils.spaceFill(curNode.value.toString(),4));
+        arr.push(utils.spaceFill(curNode.value.toString()+curNode.color,5));
         if(curNode.rightNode){
             this.doPrint(curNode.rightNode,deep+1,arr);
         }
         if(curNode.leftNode){
-            arr.push('\n',utils.spaceFill('\\',(deep+1)*4));
+            arr.push('\n',utils.spaceFill('\\',(deep+1)*5));
             this.doPrint(curNode.leftNode,deep+1,arr);
         }
     }
 
-    private doFindDir(isRight:boolean = false,curNode:BNode<T> = this.rootNode):BNode<T>{
+    private doFindDir(isRight:boolean = false,curNode:BNode<T> = this._rootNode):BNode<T>{
         let target:BNode<T> = curNode;
         while(true){
             if(!curNode)break;
@@ -220,7 +230,7 @@ export class BinarySearchTree<T extends Value<T>> implements Tree<T>{
         return target;
 
     }
-    private doFindDirValue(isRight:boolean = false,curNode:BNode<T> = this.rootNode):T|null{
+    private doFindDirValue(isRight:boolean = false,curNode:BNode<T> = this._rootNode):T|null{
         let n = this.doFindDir(isRight,curNode);
         if(n){
             return n.value;
@@ -229,6 +239,91 @@ export class BinarySearchTree<T extends Value<T>> implements Tree<T>{
     }
 }
 
-export class RBTree<T extends Value<T>> extends BinarySearchTree<T>{
+export class RBTree<T extends Comparable<T>> extends BinarySearchTree<T>{
+    add(value:T):boolean{
+        let n = super.doAdd(value);
+        if(!n)return false;
+        if(n == this._rootNode){
+            this._rootNode.color = BNode.BLACK;
+            return true;
+        }
+        n.color = BNode.RED;
+        this.afterAdd(n);
+    }
 
+    private afterAdd(curNode:BNode<T>){
+        let parentNode = curNode.parentNode,
+            uncleNode = this.getUncle(curNode);
+        if(!parentNode || !uncleNode)return;
+        /*
+        当前节点的父节点是红色，且当前节点的祖父节点的另一个子节点（叔叔节点）也是红色。
+        (01) 将“父节点”设为黑色。
+        (02) 将“叔叔节点”设为黑色。
+        (03) 将“祖父节点”设为“红色”。
+        (04) 将“祖父节点”设为“当前节点”(红色节点)；即，之后继续对“当前节点”进行操作。
+        */
+        if(parentNode.color == BNode.RED && uncleNode.color == BNode.RED){
+            parentNode.color = BNode.BLACK;
+            uncleNode.color = BNode.BLACK;
+            parentNode.parentNode.color = BNode.RED;
+            this.afterAdd(parentNode.parentNode);
+        }
+        /*
+        当前节点的父节点是红色，叔叔节点是黑色，且当前节点是其父节点的右孩子
+        (01) 将“父节点”作为“新的当前节点”。
+        (02) 以“新的当前节点”为支点进行左旋。
+        */
+        else if(parentNode.color == BNode.RED && uncleNode.color == BNode.BLACK && curNode == parentNode.rightNode){
+            this.rotateLeft(parentNode);
+        }
+        /*
+        当前节点的父节点是红色，叔叔节点是黑色，且当前节点是其父节点的左孩子
+        (01) 将“父节点”设为“黑色”。
+        (02) 将“祖父节点”设为“红色”。
+        (03) 以“祖父节点”为支点进行右旋。
+        */
+        else if(parentNode.color == BNode.RED && uncleNode.color == BNode.BLACK && curNode == parentNode.leftNode){
+            parentNode.color = BNode.BLACK;
+            parentNode.parentNode.color = BNode.RED;
+            this.rotateRight(parentNode.parentNode);
+        }
+    }
+
+    private rotateLeft(curNode:BNode<T>){
+        let parentNode = curNode.parentNode,
+            rightNode = curNode.rightNode;
+        if(curNode == parentNode.leftNode){
+            parentNode.setLeftNode(rightNode);
+        }
+        else{
+            parentNode.setRightNode(rightNode);
+        }
+        curNode.setRightNode(rightNode.leftNode);
+        rightNode.setLeftNode(curNode);
+    }
+    private rotateRight(curNode:BNode<T>){
+        let parentNode = curNode.parentNode,
+            leftNode = curNode.leftNode;
+        if(curNode == parentNode.leftNode){
+            parentNode.setLeftNode(leftNode);
+        }
+        else{
+            parentNode.setLeftNode(leftNode);
+        }
+        curNode.setLeftNode(leftNode.rightNode);
+        leftNode.setRightNode(curNode);
+    }
+
+    private getUncle(n:BNode<T>):BNode<T>{
+        let grandNode:BNode<T>;
+        if(!n.parentNode || !(grandNode = n.parentNode.parentNode)){
+            return null;
+        }
+        if(grandNode.leftNode == n.parentNode){
+            return grandNode.rightNode;
+        }
+        else{
+            return grandNode.leftNode;
+        }
+    }
 }

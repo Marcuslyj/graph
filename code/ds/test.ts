@@ -1,7 +1,7 @@
 import utils from '../utils';
 import {Queue,Weight,Tree,UnionFind} from './collection';
 import {ArrayHeap} from './heap';
-import {BinarySearchTree} from './tree';
+import {BinarySearchTree,RBTree} from './tree';
 import {ArrayUnionFind,Maze} from './union_find';
 let testArrayHeap = function(){
     let data:number[] = [31,32,26,65,68,19,21,19,14,16,13];
@@ -35,6 +35,19 @@ let testBST = function(){
 
 }
 
+let testRBTree = function(){
+    let data:number[] =
+            [8,1,4,7,3,5,11,8,3,4,5,2,6,8,9],
+            //utils.randNumArr(50),
+        tests:number[] = [3,9],
+        tree:Tree<Weight> = new RBTree<Weight>();
+    data.forEach((d:number)=>{
+        debugger;
+        tree.add(Weight.from(d));
+        tree.print();
+    });
+}
+
 let testUnionFind = function(){
     let data:number[] = [1,3,5,7,2,4,6,8],
         uf:UnionFind<Weight> = new ArrayUnionFind<Weight>();
@@ -58,5 +71,5 @@ let testMaze = function(){
 
 //let init = testBST;
 //let init = testUnionFind;
-let init = testMaze;
+let init = testRBTree;
 init();
