@@ -3,6 +3,7 @@ import {Queue,Weight,Tree,UnionFind} from './collection';
 import {ArrayHeap} from './heap';
 import {BinarySearchTree,RBTree} from './tree';
 import {ArrayUnionFind,Maze} from './union_find';
+import {JumpList} from './jump_list';
 let testArrayHeap = function(){
     let data:number[] = [31,32,26,65,68,19,21,19,14,16,13];
     let heap:Queue<Weight> = new ArrayHeap<Weight>(16);
@@ -69,7 +70,22 @@ let testMaze = function(){
     maze.print();
 }
 
+let testJumpList = function(){
+    let data:number[] = //[1,3,5,7,2,4,6,8];
+        utils.randNumArr(32,0,100);
+        //[2,1,2];
+    console.log(data.join(','))
+    let jl = new JumpList<Weight>();
+    data.forEach(function(d:number){
+        jl.add(Weight.from(d));
+    })
+    jl.print();
+    let w = Weight.from(data[0]);
+    let d = jl.remove(w);
+    console.log(w,d);
+    jl.print();
+}
 //let init = testBST;
 //let init = testUnionFind;
-let init = testRBTree;
+let init = testJumpList;
 init();

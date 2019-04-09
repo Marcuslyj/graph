@@ -239,6 +239,9 @@ export class BinarySearchTree<T extends Comparable<T>> implements Tree<T>{
     }
 }
 
+/**
+ * 红黑树，代码还是有点问题
+ */
 export class RBTree<T extends Comparable<T>> extends BinarySearchTree<T>{
     add(value:T):boolean{
         let n = super.doAdd(value);
@@ -249,12 +252,13 @@ export class RBTree<T extends Comparable<T>> extends BinarySearchTree<T>{
         }
         n.color = BNode.RED;
         this.afterAdd(n);
+        return true;
     }
 
     private afterAdd(curNode:BNode<T>){
         let parentNode = curNode.parentNode,
             uncleNode = this.getUncle(curNode);
-        if(!parentNode || !uncleNode)return;
+        if(!parentNode || !parentNode.parentNode)return;
         /*
         当前节点的父节点是红色，且当前节点的祖父节点的另一个子节点（叔叔节点）也是红色。
         (01) 将“父节点”设为黑色。
@@ -262,7 +266,7 @@ export class RBTree<T extends Comparable<T>> extends BinarySearchTree<T>{
         (03) 将“祖父节点”设为“红色”。
         (04) 将“祖父节点”设为“当前节点”(红色节点)；即，之后继续对“当前节点”进行操作。
         */
-        if(parentNode.color == BNode.RED && uncleNode.color == BNode.RED){
+        if(this.isRed(parentNode) && this.isRed(uncleNode)){
             parentNode.color = BNode.BLACK;
             uncleNode.color = BNode.BLACK;
             parentNode.parentNode.color = BNode.RED;
@@ -273,7 +277,7 @@ export class RBTree<T extends Comparable<T>> extends BinarySearchTree<T>{
         (01) 将“父节点”作为“新的当前节点”。
         (02) 以“新的当前节点”为支点进行左旋。
         */
-        else if(parentNode.color == BNode.RED && uncleNode.color == BNode.BLACK && curNode == parentNode.rightNode){
+        else if(this.isRed(parentNode) && this.isBlack(uncleNode) && curNode == parentNode.rightNode){
             this.rotateLeft(parentNode);
         }
         /*
@@ -282,11 +286,19 @@ export class RBTree<T extends Comparable<T>> extends BinarySearchTree<T>{
         (02) 将“祖父节点”设为“红色”。
         (03) 以“祖父节点”为支点进行右旋。
         */
-        else if(parentNode.color == BNode.RED && uncleNode.color == BNode.BLACK && curNode == parentNode.leftNode){
+        else if(this.isRed(parentNode) && this.isBlack(uncleNode) && curNode == parentNode.leftNode){
             parentNode.color = BNode.BLACK;
             parentNode.parentNode.color = BNode.RED;
             this.rotateRight(parentNode.parentNode);
         }
+    }
+
+    private isBlack(node:BNode<T>):boolean{
+        return !node || node.color == BNode.BLACK;
+    }
+
+    private isRed(node:BNode<T>):boolean{
+        return node != null && node.color == BNode.RED;
     }
 
     private rotateLeft(curNode:BNode<T>){
