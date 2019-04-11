@@ -4,6 +4,7 @@ import {ArrayHeap} from './heap';
 import {BinarySearchTree,RBTree} from './tree';
 import {ArrayUnionFind,Maze} from './union_find';
 import {JumpList} from './jump_list';
+import {Graph,MatrixGraph,VertexDegType, graphUtils} from './graph';
 let testArrayHeap = function(){
     let data:number[] = [31,32,26,65,68,19,21,19,14,16,13];
     let heap:Queue<Weight> = new ArrayHeap<Weight>(16);
@@ -71,21 +72,74 @@ let testMaze = function(){
 }
 
 let testJumpList = function(){
+    const N = 100000;
     let data:number[] = //[1,3,5,7,2,4,6,8];
-        utils.randNumArr(32,0,100);
+        utils.randNumArr(N,0,N);
         //[2,1,2];
-    console.log(data.join(','))
+    //console.log(data.join(','))
     let jl = new JumpList<Weight>();
     data.forEach(function(d:number){
         jl.add(Weight.from(d));
     })
-    jl.print();
+    //jl.print();
     let w = Weight.from(data[0]);
-    let d = jl.remove(w);
-    console.log(w,d);
-    jl.print();
+    Weight.startCompareCounting();
+    let d = jl.contains(w);
+    Weight.endCompareCounting();
+    console.log('Log(N) =',Math.log2(jl.size()))
+    console.log('delete',w.toString(),d);
+    //jl.print();
+}
+
+let testGraphSample = function(){
+    let graph:Graph<null> = new MatrixGraph();
+    graph.addVertex('a')
+        .addVertex('b')
+        .addVertex('c')
+        .addVertex('d')
+        .addVertex('e');
+    graph.connect('a','b',true)
+        .connect('a','c',true)
+        .connect('b','d',true)
+        .connect('c','d',true)
+        .connect('c','e',true)
+        .connect('d','e',true);
+    graph.connect('e','a',true);
+    graph.print();
+    console.log(graph.topologicalOrderSequence());
+}
+let testGraphAOE = function(){
+    let graph:Graph<null> = new MatrixGraph();
+    graph.addVertexByNames(0,1,2,3,4,5,6,7,8);
+    graph
+        .connect(0,1,true,6)
+        .connect(0,2,true,4)
+        .connect(0,3,true,5)
+        .connect(1,4,true,1)
+        .connect(2,4,true,1)
+        .connect(3,5,true,2)
+        .connect(4,6,true,9)
+        .connect(4,7,true,7)
+        .connect(5,7,true,4)
+        .connect(6,8,true,2)
+        .connect(7,8,true,4);
+    graph.print();
+    console.log(graph.topologicalOrderSequence().join(','));
+}
+
+let testBuildGraphByDeg = function(){
+    let degArr = [4,3,1,5,4,2,1];
+    if(graphUtils.canGraph(degArr)){
+        let graph:Graph<null> = graphUtils.buildGraphByDegArr(degArr);
+        graph.print();
+    }
+    else{
+        console.log('Can not graph');
+    }
 }
 //let init = testBST;
 //let init = testUnionFind;
-let init = testJumpList;
+//let init = testJumpList;
+//let init = testGraphAOE;
+let init = testBuildGraphByDeg;
 init();

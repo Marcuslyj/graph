@@ -1,6 +1,14 @@
 export class Weight implements Comparable<Weight>,Indexable{
+    private static _cCount:number = 0;
     static from(value:number,data:any = null):Weight{
         return new Weight(value,data);
+    }
+    static startCompareCounting(){
+        this._cCount = 0;
+    }
+    static endCompareCounting():number{
+        console.log('Compare Count = ',this._cCount);
+        return this._cCount;
     }
     private _value:number = 0;
     private _data:any = null;
@@ -9,6 +17,7 @@ export class Weight implements Comparable<Weight>,Indexable{
         this._data = data;
     }
     compareTo(target: Weight): number {
+        Weight._cCount ++;
         return this._value - target._value;
     }    
     valueOf(): number {

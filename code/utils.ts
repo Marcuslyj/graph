@@ -1,5 +1,5 @@
 export default {
-    spaceFill(str:string|number,size:number=3){
+    spaceFill(str:string|number = '',size:number=3){
         str = String(str);
         if(str.length >= size){
             return str;
@@ -17,5 +17,23 @@ export default {
             arr.push(Math.floor((max-min)*Math.random())+1);
         }
         return arr;
+    },
+    cloneMap:function(source:Map<any,any>,target?:Map<any,any>){
+        if(!target){
+            target = new Map();
+        }
+        source.forEach(function(value,key){
+            target.set(key,value);
+        });
+        return target;
+    },
+    cloneSet:function(source:Set<any>,target?:Set<any>){
+        if(!target){
+            target = new Set();
+        }
+        source.forEach(function(value){
+            target.add(value);
+        });
+        return target;
     }
 };
