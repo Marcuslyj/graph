@@ -49,24 +49,44 @@ export const graphUtils = {
         return graph;
     }
 }
+/**
+ * 顶点度的类型
+ */
 export enum VertexDegType {
-    ALL,IN,OUT
+    /**
+     * 全部度
+     */
+    ALL,
+    /**
+     * 入度
+     */
+    IN,
+    /**
+     * 出度
+     */OUT
 }
-type VertexName = string|number;
+export type VertexName = string|number;
 export abstract class Graph<T>{
     protected _vertexNameSet:Set<VertexName> = new Set();
     abstract print():void;
     /**
      * 连接连个顶点
-     * @param startVertexName 开始顶点
-     * @param endVertaxName 结束顶点
-     * @param weight 权重默认1
+     * @param start开始顶点
+     * @param end结束顶点
      * @param directed 是否有向默认false
+     * @param weight 权重默认1
      */
-    abstract connect(startVertexName:VertexName,endVertaxName:VertexName,directed?:boolean,weight?:number):Graph<T>;
+    abstract connect(start:VertexName,end:VertexName,directed?:boolean,weight?:number):Graph<T>;
+    /**
+     * 获取已经连接的两点之间的距离
+     * @param start 开始点
+     * @param end 结束点
+     * @returns 如果两点未连接，则返回Infinity
+     */
+    abstract getWeight(start:VertexName,end:VertexName):number;
     /**
      * 获取顶点的度
-     * @param type 度的类型
+     * @param type 度的类型。默认为全部
      */
     abstract getDeg(name:VertexName,type?:VertexDegType):number;
     /**
@@ -101,14 +121,16 @@ export abstract class Graph<T>{
      * 拓扑有序序列
      * 可以用来判断图是否有环
      * 对一个 AOV 网络进行拓扑排序的方法为： (1) 从AOV 网络中选择一个入度为 0（即没有直接前驱）的顶点并输出； (2) 从AOV 网络中删除该顶点及该顶点发出的所有边； (3) 重复步骤(1)和(2)，直至找不到入度为 0的顶点。 按照上面的方法进行拓扑排序，其结果有两种情形：第一种，所有的顶点都输出来了，也就 是整个拓扑排序完成了；第二种，仍有顶点没有输出，但剩下的图中再也没有入度为 0 的顶点， 拓扑排序不能再继续进行下去了，这就说明此图是有环图。 
+     * @param isReverse 是否为逆拓扑排序 ，默认为false
+     * @returns 拓扑排序后的顶点名称列表，无法拓扑排序则为null
      */
-    topologicalOrderSequence():VertexName[]{
+    topologicalOrderSequence(isReverse:boolean = false):VertexName[]{
         let arr:VertexName[] = [];
         let c = this.clone();
         while(true){
             let hasZero = false;
             for(const name of c._vertexNameSet){
-                if(c.getDeg(name,VertexDegType.IN) == 0){
+                if(c.getDeg(name,isReverse?VertexDegType.OUT: VertexDegType.IN) == 0){
                     hasZero = true;
                     arr.push(name);
                     c.removeVertex(name);
@@ -122,6 +144,43 @@ export abstract class Graph<T>{
                 return null;
             }
         }
+    }
+
+    /**
+     * 计算路径长度
+     * @param path 顶点名称的路径
+     */
+    pathLength(path:VertexName[]):number{
+        if(path.length < 2){
+            throw new Error('Path must has at least 2 vertex name');
+        }
+        let sum = 0;
+        for(let i=0;i<path.length-1;i++){
+            let w = this.getWeight(path[i],path[i+1]);
+            if(!isFinite(w)){
+                return Infinity;
+            }
+            sum += w;
+        }
+        return sum;
+    }
+
+    /**
+     * 求两个顶点的最长路径
+     * @param start 开始点
+     * @param end 结束点
+     */
+    longestPath(start:VertexName,end:VertexName):VertexName[]{
+        return null;
+    }
+
+    /**
+     * 获取有向有权图的关键路径
+     */
+    criticalPath():VertexName[]{
+        let tos = this.topologicalOrderSequence();
+        if(!tos)return null;
+        return null;
     }
 
     /**
@@ -156,6 +215,13 @@ export class MatrixGraph<T> extends Graph<T>{
     private _dataMap:Map<string,T>;
     private _vertexIdxMap:Map<VertexName,number> = new Map();
     private _edgeMatrix:number[][] = [];
+    getWeight(start: VertexName, end: VertexName): number {
+        if(start === end)return 0;
+        let startIdx = this.getVertexIdxByName(start),
+            endIdx = this.getVertexIdxByName(end);
+        let w = this._edgeMatrix[startIdx][endIdx];
+        return w || Infinity;
+    }
     getDeg(name:VertexName,type: VertexDegType = VertexDegType.ALL): number {
         let d = 0,
             idx = this.getVertexIdxByName(name);
@@ -230,6 +296,9 @@ export class MatrixGraph<T> extends Graph<T>{
         console.log(arr.join(''));
     }
     connect(startVertexName: VertexName, endVertaxName: VertexName, directed: boolean = false, weight:number=1): MatrixGraph<T> {
+        if(weight < 1){
+            throw new Error('Weight must greater than 0');
+        }
         let startIdx = this.getVertexIdxByName(startVertexName),
             endIdx = this.getVertexIdxByName(endVertaxName);
         this._edgeMatrix[startIdx][endIdx] = weight;

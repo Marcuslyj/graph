@@ -107,6 +107,7 @@ let testGraphSample = function(){
     graph.connect('e','a',true);
     graph.print();
     console.log(graph.topologicalOrderSequence());
+    console.log(graph.pathLength(['a','b','d','e']));
 }
 let testGraphAOE = function(){
     let graph:Graph<null> = new MatrixGraph();
@@ -141,5 +142,6 @@ let testBuildGraphByDeg = function(){
 //let init = testUnionFind;
 //let init = testJumpList;
 //let init = testGraphAOE;
-let init = testBuildGraphByDeg;
+//let init = testBuildGraphByDeg;
+let init = testGraphSample;
 init();
