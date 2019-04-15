@@ -79,7 +79,7 @@ export interface Queue<T extends Comparable<T>> extends Collection<T>{
     removeMin():T;
 }
 
-export interface UnionFind<T extends Indexable> extends Collection<T>{
+export interface UnionFind<T> extends Collection<T>{
     /**
      * 联合两个元素，使他们建立关系
      */

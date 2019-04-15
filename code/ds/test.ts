@@ -2,7 +2,7 @@ import utils from '../utils';
 import {Queue,Weight,Tree,UnionFind} from './collection';
 import {ArrayHeap} from './heap';
 import {BinarySearchTree,RBTree} from './tree';
-import {ArrayUnionFind,Maze} from './union_find';
+import {ArrayUnionFind,Maze,MapUnionFind} from './union_find';
 import {JumpList} from './jump_list';
 import {Graph,MatrixGraph,VertexDegType, graphUtils} from './graph';
 let testArrayHeap = function(){
@@ -61,6 +61,22 @@ let testUnionFind = function(){
     uf.union(Weight.from(5),Weight.from(7));
     console.log(uf.test(Weight.from(1),Weight.from(7)));
     console.log(uf.test(Weight.from(2),Weight.from(7)));
+    uf.print();
+}
+
+let testMapUnionFind = function(){
+    let uf:UnionFind<number> = new MapUnionFind();
+    let data:number[] = [1,3,5,7,2,4,6,8];
+    data.forEach(n=>uf.add(n));
+    uf.union(1,3);
+    uf.union(3,5);
+    uf.union(5,7);
+    uf.union(2,4);
+    uf.union(4,6);
+    uf.union(6,8);
+    console.log(uf.test(1,3),uf.test(1,2));
+    uf.union(1,2);
+    console.log(uf.test(7,8),uf.test(1,4));
     uf.print();
 }
 
@@ -138,10 +154,38 @@ let testBuildGraphByDeg = function(){
         console.log('Can not graph');
     }
 }
+
+let testMST = function(){
+    let graph:Graph<null> = new MatrixGraph();
+    graph
+        .addVertex(1)
+        .addVertex(2)
+        .addVertex(3)
+        .addVertex(4)
+        .addVertex(5)
+        .addVertex(6)
+        .addVertex(7);
+    graph
+        .connect(1,2,false,28)
+        .connect(2,3,false,16)
+        .connect(3,4,false,12)
+        .connect(4,5,false,22)
+        .connect(5,6,false,25)
+        .connect(6,1,false,10)
+        .connect(2,7,false,14)
+        .connect(5,7,false,24)
+        .connect(4,7,false,18);
+    graph.print();
+    let mst = graph.miniSpannirngTree();
+    mst.print();
+}
+
 //let init = testBST;
 //let init = testUnionFind;
 //let init = testJumpList;
 //let init = testGraphAOE;
 //let init = testBuildGraphByDeg;
-let init = testGraphSample;
+//let init = testGraphSample;
+//let init = testMapUnionFind;
+let init = testMST;
 init();

@@ -1,4 +1,64 @@
 import {UnionFind,Indexable} from './collection';
+export class MapUnionFind<T> implements UnionFind<T>{
+    private _set:Map<T,T> = new Map();
+    union(a: T, b: T): void {
+        if(a === b)return;
+        if(this.test(a,b))return;
+        let aRoot = this.find(a),
+            bRoot = this.find(b);
+        this._set.set(aRoot,bRoot);
+    }    
+    test(a: T, b: T): boolean {
+        let aRoot = this.find(a),
+            bRoot = this.find(b);
+        return aRoot === bRoot;
+    }
+    find(a: T):T {
+        let cur:T = a,
+            root:T = null;
+        while(true){
+            root = this._set.get(cur);
+            if(root === null){
+                root = cur;
+                break;
+            }
+            cur = root;
+        }
+        let prev = this._set.get(a);
+        if(prev !== null && prev !== root){
+            this._set.set(a,root);
+        }
+        return root;
+    }
+    add(value: T): boolean {
+        if(this._set.has(value)){
+            return false;
+        }
+        this._set.set(value,null);
+        return true;
+    }
+    contains(value: T): boolean {
+        return this._set.has(value);
+    }
+    remove(value: T): boolean {
+        throw new Error("Method not implemented.");
+    }
+    isEmpty(): boolean {
+        return this._set.size == 0;
+    }
+    size(): number {
+        return this._set.size;
+    }
+    print(): void {
+        let arr:string[] = [];
+        this._set.forEach(function(value,key){
+            arr.push(`${key}=>${value}`);
+        });
+        console.log(arr.join(','));
+    }
+
+
+}
 export class ArrayUnionFind<T extends Indexable> implements UnionFind<T>{
     private _arr:number[];
     private _size:number = 0;
@@ -10,9 +70,6 @@ export class ArrayUnionFind<T extends Indexable> implements UnionFind<T>{
         if(this.test(a,b))return;
         let aIdx = this.find(a),
             bIdx = this.find(b);
-        if(aIdx == bIdx){
-            debugger;
-        }
         this._arr[aIdx] = bIdx;
     }    
     test(a: T, b: T): boolean {
@@ -44,13 +101,15 @@ export class ArrayUnionFind<T extends Indexable> implements UnionFind<T>{
     add(value: T): boolean {
         let idx = value.getIndex();
         let has = this._arr[idx] !== undefined;
+        if(has)return false;
         this._arr[idx] = -1;
-        return !has;
+        return true;
     }
     contains(value: T): boolean {
         return this._arr[value.getIndex()] !== undefined;
     }
     remove(value: T): boolean {
+        throw new Error("Method todo.");
         return delete this._arr[value.getIndex()];
     }
     isEmpty(): boolean {

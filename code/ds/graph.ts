@@ -1,4 +1,7 @@
 import utils from '../utils';
+import {Comparable,UnionFind} from './collection';
+import {ArrayHeap} from './heap';
+import {MapUnionFind} from './union_find';
 export const graphUtils = {
     /**
      * 判断一个顶点度的序列是否可图
@@ -66,6 +69,21 @@ export enum VertexDegType {
      */OUT
 }
 export type VertexName = string|number;
+
+class VertexEdgeWeight implements Comparable<VertexEdgeWeight>{
+    constructor(public readonly a:VertexName,public readonly b:VertexName,public readonly weight:number){
+
+    }
+    compareTo(target: VertexEdgeWeight): number {
+        return this.weight - target.weight;
+    }    
+    valueOf(): number {
+        return this.weight;
+    }
+    toString(): string {
+        return `${this.a}-${this.weight}-${this.b}`;
+    }
+}
 export abstract class Graph<T>{
     protected _vertexNameSet:Set<VertexName> = new Set();
     abstract print():void;
@@ -193,6 +211,36 @@ export abstract class Graph<T>{
     }
 
     /**
+     * 获取无向图的最小生成树
+     */
+    miniSpannirngTree():Graph<T>{
+        let c = this.doClone(true);
+        let heap:ArrayHeap<VertexEdgeWeight> = new ArrayHeap();
+        let uf:UnionFind<VertexName> = new MapUnionFind();
+        let names = Array.from<VertexName>(this._vertexNameSet);
+        for(let i=0;i<names.length;i++){
+            let startName = names[i];
+            c.addVertex(startName);
+            uf.add(startName);
+            for(let j=i+1;j<names.length;j++){
+                let endName = names[j];
+                let w = this.getWeight(startName,endName);
+                if(!isFinite(w))continue;
+                heap.add(new VertexEdgeWeight(startName,endName,w));
+            }
+        }
+        let curVEW:VertexEdgeWeight = null;
+        while(curVEW = heap.removeMin()){
+            if(uf.test(curVEW.a,curVEW.b)){
+                continue;
+            }
+            uf.union(curVEW.a,curVEW.b);
+            c.connect(curVEW.a,curVEW.b,false,curVEW.weight);
+        }
+        return c;
+    }
+
+    /**
      * @readonly
      * 获取图的阶（顶点个数）
      */
@@ -202,7 +250,7 @@ export abstract class Graph<T>{
 
     protected abstract doAddVertex(name:VertexName,data:T):void;
     protected abstract doRemoveVertex(name:VertexName):void;
-    protected abstract doClone():Graph<T>;
+    protected abstract doClone(onlyInstance?:boolean):Graph<T>;
 }
 /**
  * 邻接表图
@@ -307,8 +355,9 @@ export class MatrixGraph<T> extends Graph<T>{
         }
         return this;
     }
-    protected doClone():MatrixGraph<T>{
+    protected doClone(onlyInstance:boolean = false):MatrixGraph<T>{
         let c = new MatrixGraph<T>();
+        if(onlyInstance)return c;
         utils.cloneMap(this._vertexIdxMap,c._vertexIdxMap);
         if(this._dataMap){
             c._dataMap = utils.cloneMap(this._dataMap);
