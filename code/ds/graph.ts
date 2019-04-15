@@ -69,7 +69,29 @@ export enum VertexDegType {
      */OUT
 }
 export type VertexName = string|number;
-
+export type VertexWeight = {
+    vertex:VertexName,
+    weight:number
+};
+/**
+ * @param path 当前的遍历路径
+ * @returns 如果返回false，则终止遍历
+ */
+export type TraversalCallback = (path:VertexName[])=>boolean|undefined;
+let vertexWeightCompareFn = function(a:VertexWeight,b:VertexWeight){
+    if(isFinite(a.weight) && isFinite(b.weight)){
+        return a.weight - b.weight;
+    }
+    else if(!isFinite(a.weight) && !isFinite(b.weight)){
+        return 0;
+    }
+    else if(!isFinite(a.weight)){
+        return 1;
+    }
+    else {
+        return -1;
+    }
+}
 class VertexEdgeWeight implements Comparable<VertexEdgeWeight>{
     constructor(public readonly a:VertexName,public readonly b:VertexName,public readonly weight:number){
 
@@ -107,6 +129,7 @@ export abstract class Graph<T>{
      * @param type 度的类型。默认为全部
      */
     abstract getDeg(name:VertexName,type?:VertexDegType):number;
+    abstract getConnected(start:VertexName):VertexWeight[];
     /**
      * 根据名称添加顶点
      * @param names 名称
@@ -202,6 +225,46 @@ export abstract class Graph<T>{
     }
 
     /**
+     * 深度优先遍历
+     * @param start 开始位置
+     */
+    dft(start:VertexName,cb?:TraversalCallback):void{
+        debugger;
+        type StackItem = {
+            curIdx:number,
+            vertexList:VertexName[]
+        };
+        let mapper = function(i:VertexWeight){return i.vertex};
+        let stack:StackItem[] = [{
+            curIdx:0,
+            vertexList:this.getConnected(start).map(mapper)
+        }];
+        while(stack.length){
+            let curItem = stack[stack.length - 1];
+            if(curItem.curIdx < curItem.vertexList.length){
+                console.log(curItem.vertexList[curItem.curIdx]);
+                let connected = this.getConnected(curItem.vertexList[curItem.curIdx]);
+                if(connected && connected.length){
+                    stack.push({
+                        curIdx:0,
+                        vertexList:connected.map(mapper)
+                    })
+                }
+                curItem.curIdx++;
+            }
+            else{
+                stack.pop();
+            }
+        }
+    }
+    /**
+     * 广度优先遍历
+     * @param start 开始位置
+     */
+    bft(start:VertexName,cb?:TraversalCallback):void{
+    }
+
+    /**
      * 克隆一个图
      */
     clone():Graph<T>{
@@ -241,6 +304,55 @@ export abstract class Graph<T>{
     }
 
     /**
+     * 计算最短路径
+     */
+    shortestPath(start:VertexName,end:VertexName):VertexName[]{
+        return this.shortestPath_dijkstra(start,end);
+    }
+
+    private shortestPath_dijkstra(start:VertexName,end:VertexName):VertexName[]{
+        let s:Set<VertexName> = new Set();
+        let pathPrev:Map<VertexName,VertexName> = new Map();
+        let dist:Map<VertexName,number> = new Map();
+        this._vertexNameSet.forEach((end)=>{
+            if(start === end)return;
+            s.add(end);
+            dist.set(end,this.getWeight(start,end));
+        });
+        while(s.size){
+            let minV:VertexName = null,
+                minDist = Number.MAX_SAFE_INTEGER;
+            s.forEach(function(n){
+                let d = dist.get(n);
+                if(d < minDist){
+                    minDist = d;
+                    minV = n;
+                }
+            });
+            s.delete(minV);
+            let connected = this.getConnected(minV);
+            if(connected && connected.length){
+                connected.forEach(function(cv){
+                    let cvd = dist.get(cv.vertex),
+                        newD = minDist + cv.weight;
+                    if(newD < cvd){
+                        dist.set(cv.vertex,newD);
+                        pathPrev.set(cv.vertex,minV);
+                    }
+                });
+            }
+        }
+        let ret:VertexName[] = [];
+        let cur = end;
+        while(cur){
+            ret.unshift(cur);
+            cur = pathPrev.get(cur);
+        }
+        ret.unshift(start);
+        return ret;
+    }
+
+    /**
      * @readonly
      * 获取图的阶（顶点个数）
      */
@@ -263,6 +375,21 @@ export class MatrixGraph<T> extends Graph<T>{
     private _dataMap:Map<string,T>;
     private _vertexIdxMap:Map<VertexName,number> = new Map();
     private _edgeMatrix:number[][] = [];
+    getConnected(start: VertexName): VertexWeight[] {
+        let arr:VertexWeight[] = [];
+        let startIdx = this.getVertexIdxByName(start);
+        this._vertexIdxMap.forEach((endIdx,end)=>{
+            if(start === end)return;
+            let w = this._edgeMatrix[startIdx][endIdx];
+            if(w){
+                arr.push({
+                    vertex:end,
+                    weight:w
+                });
+            }
+        });
+        return arr;
+    }
     getWeight(start: VertexName, end: VertexName): number {
         if(start === end)return 0;
         let startIdx = this.getVertexIdxByName(start),
@@ -276,7 +403,7 @@ export class MatrixGraph<T> extends Graph<T>{
         if(type == VertexDegType.ALL || type == VertexDegType.OUT){
             let wArr = this._edgeMatrix[idx];
             wArr.forEach(function(w:number){
-                if(w && w>0){
+                if(w){
                     d++;
                 }
             });
@@ -284,7 +411,7 @@ export class MatrixGraph<T> extends Graph<T>{
         if(type == VertexDegType.ALL || type == VertexDegType.IN){
             this._edgeMatrix.forEach(function(wArr:number[]){
                 let w = wArr[idx];
-                if(w && w>0){
+                if(w){
                     d++;
                 }
             });

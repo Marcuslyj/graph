@@ -157,14 +157,7 @@ let testBuildGraphByDeg = function(){
 
 let testMST = function(){
     let graph:Graph<null> = new MatrixGraph();
-    graph
-        .addVertex(1)
-        .addVertex(2)
-        .addVertex(3)
-        .addVertex(4)
-        .addVertex(5)
-        .addVertex(6)
-        .addVertex(7);
+    graph.addVertexByNames(1,2,3,4,5,6,7);
     graph
         .connect(1,2,false,28)
         .connect(2,3,false,16)
@@ -180,6 +173,22 @@ let testMST = function(){
     mst.print();
 }
 
+let testShortestPath = function(){
+    let graph:Graph<null> = new MatrixGraph();
+    graph.addVertexByNames(0,1,2,3,4,5,6);
+    graph
+        .connect(0,1,true,2)
+        .connect(0,2,true,1)
+        .connect(1,3,true,1)
+        .connect(2,4,true,2)
+        .connect(2,5,true,1)
+        .connect(3,6,true,1)
+        .connect(4,6,true,2)
+        .connect(5,6,true,3);
+    let s = graph.shortestPath(0,6);
+    console.log('Shortest:',s && s.join(','));
+    graph.dft(0);
+}
 //let init = testBST;
 //let init = testUnionFind;
 //let init = testJumpList;
@@ -187,5 +196,6 @@ let testMST = function(){
 //let init = testBuildGraphByDeg;
 //let init = testGraphSample;
 //let init = testMapUnionFind;
-let init = testMST;
+//let init = testMST;
+let init = testShortestPath;
 init();
